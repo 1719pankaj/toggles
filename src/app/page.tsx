@@ -21,8 +21,9 @@ export default function Home() {
     if (enabled) {
       // Count currently enabled switches
       const enabledCount = switches.filter(s => s.enabled).length
+      const maxAllowed = switches.length - 1
       
-      if (enabledCount >= 2) {
+      if (enabledCount >= maxAllowed) {
         // Find the earliest enabled switch
         const earliest = [...switches]
           .filter(s => s.enabled && s.enabledAt !== null)
@@ -58,6 +59,30 @@ export default function Home() {
 
   const removeRow = (index: number) => {
     const newSwitches = switches.filter((_, i) => i !== index)
+    
+    // After removing, check if we have too many enabled switches
+    const enabledSwitches = newSwitches.filter(s => s.enabled)
+    const maxAllowed = newSwitches.length - 1
+    
+    if (enabledSwitches.length > maxAllowed) {
+      // Turn off the earliest enabled switches until we meet the limit
+      const sortedEnabled = enabledSwitches
+        .sort((a, b) => (a.enabledAt || 0) - (b.enabledAt || 0))
+      
+      // Calculate how many need to be turned off
+      const turnOffCount = enabledSwitches.length - maxAllowed
+      
+      // Turn off the earliest ones
+      for (let i = 0; i < turnOffCount; i++) {
+        const switchToDisable = sortedEnabled[i]
+        const switchIndex = newSwitches.findIndex(s => s === switchToDisable)
+        if (switchIndex !== -1) {
+          newSwitches[switchIndex].enabled = false
+          newSwitches[switchIndex].enabledAt = null
+        }
+      }
+    }
+    
     setSwitches(newSwitches)
   }
 
