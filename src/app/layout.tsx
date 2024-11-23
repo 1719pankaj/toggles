@@ -1,5 +1,7 @@
 import './globals.css'
 import type { Metadata } from 'next'
+import { ThemeProvider } from "@/components/theme-provider"
+import { SharedLayout } from '@/components/shared-layout'
 
 export const metadata: Metadata = {
   title: 'Toggles',
@@ -12,8 +14,19 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body className="h-full">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <SharedLayout>
+            {children}
+          </SharedLayout>
+        </ThemeProvider>
+      </body>
     </html>
   )
 }
